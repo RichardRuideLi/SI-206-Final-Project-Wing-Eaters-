@@ -49,8 +49,8 @@ if offset == 0:
     # Execute table creation
     cursor.execute(create_table_sql)
 
-# Select the next 100 rows based on the offset
-chunk = data[offset:offset + 100]
+# Select the next 25 rows based on the offset
+chunk = data[offset:offset + 25]
 
 # If there are rows to insert, insert them into the table
 if not chunk.empty:
