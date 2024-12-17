@@ -1,0 +1,29 @@
+import requests
+import pandas as pd
+
+def fetch_and_clean_covid_data():
+    # URL to fetch the LA County COVID-19 data
+    url = "https://data.lacity.org/api/views/jsff-uc6b/rows.json?accessType=DOWNLOAD"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
+        exit()
+
+    columns = data['meta']['view']['columns']
+    column_names = [col['name'] for col in columns]
+    rows = data['data']
+
+    # Create DataFrame and clean data
+    df = pd.DataFrame(rows, columns=column_names)
+    df = df.dropna(how='all', axis=1)  # Clean up empty columns
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_", regex=True)
+
+    output_file = "la_county_covid_data_cleaned.csv"
+    df.to_csv(output_file, index=False)
+
+    print(f"Data has been cleaned and saved to {output_file}")
+    return df

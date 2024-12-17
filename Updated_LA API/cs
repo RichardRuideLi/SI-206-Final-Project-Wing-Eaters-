@@ -1,0 +1,34 @@
+import sqlite3
+import pandas as pd
+
+# Define the database file and output CSV file paths
+db_file = "covid_data.db"               # Path to your SQLite database
+output_csv_file = "LA_monthly_averages.csv"  # Name of the output CSV file
+
+# Connect to the SQLite database
+conn = sqlite3.connect(db_file)
+
+# SQL query to calculate monthly averages
+query = '''
+    SELECT 
+        SUBSTR(date, 1, 7) AS month, 
+        AVG(cases) AS avg_cases, 
+        AVG(deaths) AS avg_deaths
+    FROM 
+        covid_cases
+    GROUP BY 
+        month
+    ORDER BY 
+        month ASC;
+'''
+
+# Execute the query and load the result into a pandas DataFrame
+df = pd.read_sql_query(query, conn)
+
+# Save the DataFrame as a CSV file
+df.to_csv(output_csv_file, index=False)
+
+# Close the database connection
+conn.close()
+
+print(f"Monthly averages have been saved to {output_csv_file}")
